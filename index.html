@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Empire Casino</title>
+    <style>
+        :root {
+            --gold: #ffd700;
+            --neon: #00f2ff;
+            --dark-card: #1a1a1a;
+            --bg: #050505;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            letter-spacing: 4px;
+            background: linear-gradient(to bottom, var(--gold), #b8860b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        .balance-bar {
+            margin-top: 10px;
+            color: var(--neon);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+
+        /* Сетка игр */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            width: 90%;
+            max-width: 1200px;
+            padding: 40px 0;
+        }
+
+        .game-card {
+            background: var(--dark-card);
+            height: 350px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 25px;
+            border: 1px solid #333;
+            text-decoration: none;
+            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        /* Активная карточка Слотов */
+        .game-card.active {
+            border-color: var(--gold);
+            cursor: pointer;
+        }
+
+        .game-card.active:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+        }
+
+        /* Фон с прокруткой для слотов */
+        .slots-bg-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-around;
+            opacity: 0.2;
+            z-index: 1;
+        }
+
+        .mini-reel {
+            display: flex;
+            flex-direction: column;
+            animation: slowScroll 20s linear infinite;
+        }
+
+        .mini-reel span {
+            font-size: 40px;
+            padding: 10px 0;
+        }
+
+        @keyframes slowScroll {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50%); }
+        }
+
+        /* Неактивные карточки */
+        .game-card.coming-soon {
+            filter: grayscale(1);
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .coming-soon-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 5;
+            border: 1px solid #444;
+        }
+
+        .game-title {
+            position: relative;
+            z-index: 10;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .game-desc {
+            position: relative;
+            z-index: 10;
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .play-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--gold);
+            color: black;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>NEON EMPIRE</h1>
+        <div class="balance-bar">VIRTUAL CASINO LOBBY</div>
+    </header>
+
+    <div class="game-grid">
+        <!-- АКТИВНАЯ ИГРА: СЛОТЫ -->
+        <a href="slots.html" class="game-card active">
+            <div class="play-badge">PLAY NOW</div>
+            <div class="slots-bg-animation">
+                <div class="mini-reel">
+                    <span>🍒</span><span>💎</span><span>7️⃣</span><span>🍋</span><span>🍇</span><span>🔔</span>
+                    <span>🍒</span><span>💎</span><span>7️⃣</span><span>🍋</span><span>🍇</span><span>🔔</span>
+                </div>
+                <div class="mini-reel" style="animation-delay: -5s;">
+                    <span>7️⃣</span><span>🍋</span><span>🍇</span><span>🍒</span><span>💎</span><span>🔔</span>
+                    <span>7️⃣</span><span>🍋</span><span>🍇</span><span>🍒</span><span>💎</span><span>🔔</span>
+                </div>
+                <div class="mini-reel" style="animation-delay: -12s;">
+                    <span>💎</span><span>🔔</span><span>7️⃣</span><span>🍇</span><span>🍒</span><span>🍋</span>
+                    <span>💎</span><span>🔔</span><span>7️⃣</span><span>🍇</span><span>🍒</span><span>🍋</span>
+                </div>
+            </div>
+            <div class="game-info">
+                <p class="game-title">Lucky Joe Slots</p>
+                <p class="game-desc">Classic 3-reel experience with high stakes.</p>
+            </div>
+        </a>
+
+        <!-- COMING SOON: POKER -->
+        <div class="game-card coming-soon">
+            <div class="coming-soon-overlay">COMING SOON</div>
+            <div class="game-info">
+                <p class="game-title">Texas Hold'em</p>
+                <p class="game-desc">The ultimate poker challenge.</p>
+            </div>
+        </div>
+
+        <!-- COMING SOON: ROULETTE -->
+        <div class="game-card coming-soon">
+            <div class="coming-soon-overlay">COMING SOON</div>
+            <div class="game-info">
+                <p class="game-title">Neon Roulette</p>
+                <p class="game-desc">Spin the wheel and win big.</p>
+            </div>
+        </div>
+
+        <!-- COMING SOON: BLACKJACK -->
+        <div class="game-card coming-soon">
+            <div class="coming-soon-overlay">COMING SOON</div>
+            <div class="game-info">
+                <p class="game-title">Blackjack 21</p>
+                <p class="game-desc">Beat the dealer in this classic.</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

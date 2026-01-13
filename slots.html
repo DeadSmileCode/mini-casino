@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucky Joe Slot — Auto Mode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lucky Joe Slot — Mobile Friendly</title>
     <style>
         :root {
             --gold: #ffd700;
@@ -12,26 +12,70 @@
             --bg-dark: #0a0a0a;
         }
 
+        /* Адаптивность для мобилок */
+        @media (max-width: 480px) {
+            :root {
+                --symbol-height: 80px; /* Уменьшаем размер на телефонах */
+            }
+            .machine {
+                padding: 20px !important;
+                width: 95% !important;
+            }
+            .symbol {
+                font-size: 40px !important;
+            }
+            .stat-value {
+                font-size: 20px !important;
+            }
+            .btn-spin {
+                padding: 15px 0 !important;
+                font-size: 18px !important;
+            }
+        }
+
         body {
             background: var(--bg-dark);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             font-family: 'Segoe UI', Roboto, sans-serif;
             color: white;
-            overflow: hidden;
+            overflow-x: hidden;
+        }
+
+        /* Кнопка возврата */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 14px;
+            border: 1px solid var(--gold);
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: 0.3s;
+            z-index: 1000;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .back-btn:hover {
+            background: var(--gold);
+            color: black;
         }
 
         .machine {
             background: linear-gradient(145deg, #2a2a2a, #111);
             padding: 40px;
             border-radius: 40px;
-            border: 8px solid #444;
+            border: 6px solid #444;
             box-shadow: 0 0 60px rgba(0,0,0,0.8), inset 0 0 15px var(--gold);
             text-align: center;
-            width: 400px;
+            width: 90%;
+            max-width: 400px;
             position: relative;
         }
 
@@ -40,31 +84,30 @@
             display: flex;
             justify-content: space-between;
             background: #000;
-            padding: 15px;
+            padding: 12px;
             border-radius: 15px;
             border: 2px solid #333;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
-        .stat-box { font-size: 12px; color: #888; text-transform: uppercase; }
-        .stat-value { display: block; font-size: 26px; color: var(--neon); font-weight: bold; }
+        .stat-box { font-size: 10px; color: #888; text-transform: uppercase; }
+        .stat-value { display: block; font-size: 24px; color: var(--neon); font-weight: bold; }
 
         /* Reels */
         .slot-window {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             background: #000;
-            padding: 15px;
+            padding: 12px;
             border-radius: 20px;
             border: 4px solid #222;
             overflow: hidden;
             height: var(--symbol-height);
             justify-content: center;
-            position: relative;
         }
 
         .reel-container {
-            width: 90px;
+            flex: 1;
             height: var(--symbol-height);
             background: white;
             border-radius: 8px;
@@ -87,7 +130,7 @@
             font-size: 55px;
         }
 
-        /* Animations */
+        /* Spinning Animation */
         @keyframes spinning {
             from { transform: translateY(0); }
             to { transform: translateY(calc(-1 * var(--symbol-height) * 6)); }
@@ -107,17 +150,16 @@
             border-radius: 15px;
             color: #000;
             cursor: pointer;
-            box-shadow: 0 6px 0 #996600;
+            box-shadow: 0 5px 0 #996600;
             transition: 0.1s;
             text-transform: uppercase;
         }
 
-        .btn-spin:active { transform: translateY(3px); box-shadow: 0 3px 0 #996600; }
+        .btn-spin:active { transform: translateY(3px); box-shadow: 0 2px 0 #996600; }
         .btn-spin:disabled { filter: grayscale(1); opacity: 0.6; }
 
-        /* Autospin Toggle */
         .auto-container {
-            margin-top: 20px;
+            margin-top: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -126,19 +168,9 @@
             color: #aaa;
         }
 
-        .auto-container span {
-            font-weight: 700;
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
+        /* Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-
         .slider {
             position: absolute;
             cursor: pointer;
@@ -147,21 +179,19 @@
             transition: .4s;
             border-radius: 24px;
         }
-
         .slider:before {
             position: absolute;
             content: "";
-            height: 18px; width: 18px;
+            height: 16px; width: 16px;
             left: 3px; bottom: 3px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
         }
-
         input:checked + .slider { background-color: var(--neon); }
-        input:checked + .slider:before { transform: translateX(26px); }
+        input:checked + .slider:before { transform: translateX(22px); }
 
-        /* Win Toast (Notification) */
+        /* Win Toast */
         .toast {
             position: fixed;
             bottom: -100px;
@@ -169,33 +199,30 @@
             transform: translateX(-50%);
             background: linear-gradient(45deg, #ffd700, #ff8c00);
             color: #000;
-            padding: 15px 40px;
+            padding: 12px 30px;
             border-radius: 50px;
             font-weight: bold;
-            font-size: 20px;
+            font-size: 18px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 100;
-            white-space: nowrap;
+            z-index: 2000;
+            text-align: center;
         }
-
-        .toast.show { bottom: 40px; }
+        .toast.show { bottom: 30px; }
 
         .msg-area {
             margin-top: 15px;
             height: 24px;
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 16px;
             color: var(--gold);
         }
-
-        .jackpot-text { animation: blink 0.3s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
     </style>
 </head>
 <body>
 
-<div id="win-toast" class="toast">YOU WON $100!</div>
+<a href="index.html" class="back-btn">← LOBBY</a>
+
+<div id="win-toast" class="toast">WIN: $0</div>
 
 <div class="machine">
     <div class="display">
@@ -219,18 +246,15 @@
         </label>
     </div>
 
-    <div id="msg" class="msg-area">Ready to play?</div>
+    <div id="msg" class="msg-area">Good Luck!</div>
 </div>
 
 <script>
-    // ================= SETTINGS =================
     const CHANCE_3_MATCH = 0.12; 
     const CHANCE_2_MATCH = 0.30; 
     const JACKPOT_CHANCE = 0.05; 
     const SPIN_COST = 10;
-    const WIN_2_MULTIPLIER = 2;  
-    const AUTO_DELAY = 2000; // Delay between spins in auto-mode (ms)
-    // ============================================
+    const AUTO_DELAY = 1000;
 
     const symbols = ['🍒', '🍋', '🍇', '🔔', '💎', '7️⃣'];
     const multipliers = {'🍒':3, '🍋':5, '🍇':10, '🔔':20, '💎':50, '7️⃣':100};
@@ -241,6 +265,11 @@
     const spinBtn = document.getElementById('spin-btn');
     const autoToggle = document.getElementById('auto-toggle');
     const toast = document.getElementById('win-toast');
+
+    // Функция для получения текущей высоты символа (для адаптивности)
+    function getSymbolHeight() {
+        return document.querySelector('.reel-container').clientHeight;
+    }
 
     function init() {
         reels.forEach(reel => {
@@ -255,7 +284,7 @@
     function showToast(amount) {
         toast.textContent = `WIN: $${amount}!`;
         toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2500);
+        setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
     function calculateResult() {
@@ -283,7 +312,8 @@
         if (isSpinning) return;
         if (balance < SPIN_COST) {
             autoToggle.checked = false;
-            return alert("Insufficient balance!");
+            document.getElementById('msg').textContent = "Out of cash!";
+            return;
         }
 
         isSpinning = true;
@@ -291,10 +321,10 @@
         updateUI(0);
         
         document.getElementById('msg').textContent = "Spinning...";
-        document.getElementById('msg').classList.remove('jackpot-text');
         spinBtn.disabled = true;
 
         const result = calculateResult();
+        const symbolHeight = getSymbolHeight();
 
         reels.forEach(reel => {
             reel.style.transition = 'none';
@@ -305,13 +335,13 @@
             setTimeout(() => {
                 reel.classList.remove('is-spinning');
                 const symbolIdx = symbols.indexOf(result[i]);
-                const finalOffset = symbolIdx * 120;
+                const finalOffset = symbolIdx * symbolHeight;
                 reel.style.transition = 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
                 reel.style.transform = `translateY(-${finalOffset}px)`;
-            }, 1000 + (i * 600));
+            }, 800 + (i * 500));
         });
 
-        setTimeout(() => finalize(result), 2500);
+        setTimeout(() => finalize(result), 2200);
     }
 
     function finalize(result) {
@@ -321,10 +351,9 @@
         if (uniqueSymbols.length === 1) {
             winAmount = SPIN_COST * multipliers[result[0]];
             document.getElementById('msg').textContent = "MEGA WIN!";
-            if(result[0] === '7️⃣') document.getElementById('msg').classList.add('jackpot-text');
         } 
         else if (uniqueSymbols.length === 2) {
-            winAmount = SPIN_COST * WIN_2_MULTIPLIER;
+            winAmount = SPIN_COST * 2;
             document.getElementById('msg').textContent = "PAIR WIN!";
         } else {
             document.getElementById('msg').textContent = "Try again";
@@ -341,11 +370,8 @@
         isSpinning = false;
         spinBtn.disabled = false;
 
-        // Auto-spin logic
         if (autoToggle.checked) {
-            setTimeout(() => {
-                if (autoToggle.checked) spin();
-            }, AUTO_DELAY);
+            setTimeout(() => { if (autoToggle.checked) spin(); }, AUTO_DELAY);
         }
     }
 
