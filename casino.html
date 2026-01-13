@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Joe Slot — Auto Mode</title>
+    <style>
+        :root {
+            --gold: #ffd700;
+            --neon: #00f2ff;
+            --symbol-height: 120px;
+            --bg-dark: #0a0a0a;
+        }
+
+        body {
+            background: var(--bg-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        .machine {
+            background: linear-gradient(145deg, #2a2a2a, #111);
+            padding: 40px;
+            border-radius: 40px;
+            border: 8px solid #444;
+            box-shadow: 0 0 60px rgba(0,0,0,0.8), inset 0 0 15px var(--gold);
+            text-align: center;
+            width: 400px;
+            position: relative;
+        }
+
+        /* Display Stats */
+        .display {
+            display: flex;
+            justify-content: space-between;
+            background: #000;
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid #333;
+            margin-bottom: 25px;
+        }
+
+        .stat-box { font-size: 12px; color: #888; text-transform: uppercase; }
+        .stat-value { display: block; font-size: 26px; color: var(--neon); font-weight: bold; }
+
+        /* Reels */
+        .slot-window {
+            display: flex;
+            gap: 12px;
+            background: #000;
+            padding: 15px;
+            border-radius: 20px;
+            border: 4px solid #222;
+            overflow: hidden;
+            height: var(--symbol-height);
+            justify-content: center;
+            position: relative;
+        }
+
+        .reel-container {
+            width: 90px;
+            height: var(--symbol-height);
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .reel-strip {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .symbol {
+            height: var(--symbol-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 55px;
+        }
+
+        /* Animations */
+        @keyframes spinning {
+            from { transform: translateY(0); }
+            to { transform: translateY(calc(-1 * var(--symbol-height) * 6)); }
+        }
+
+        .is-spinning { animation: spinning 0.15s linear infinite; }
+
+        /* Controls */
+        .btn-spin {
+            margin-top: 20px;
+            padding: 18px 0;
+            width: 100%;
+            font-size: 22px;
+            font-weight: bold;
+            background: linear-gradient(#ffcc00, #ff9900);
+            border: none;
+            border-radius: 15px;
+            color: #000;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #996600;
+            transition: 0.1s;
+            text-transform: uppercase;
+        }
+
+        .btn-spin:active { transform: translateY(3px); box-shadow: 0 3px 0 #996600; }
+        .btn-spin:disabled { filter: grayscale(1); opacity: 0.6; }
+
+        /* Autospin Toggle */
+        .auto-container {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .auto-container span {
+            font-weight: 700;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #444;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--neon); }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        /* Win Toast (Notification) */
+        .toast {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            color: #000;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            white-space: nowrap;
+        }
+
+        .toast.show { bottom: 40px; }
+
+        .msg-area {
+            margin-top: 15px;
+            height: 24px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gold);
+        }
+
+        .jackpot-text { animation: blink 0.3s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+<div id="win-toast" class="toast">YOU WON $100!</div>
+
+<div class="machine">
+    <div class="display">
+        <div class="stat-box">BALANCE<span id="balance" class="stat-value">1000</span></div>
+        <div class="stat-box">LAST WIN<span id="last-win" class="stat-value">0</span></div>
+    </div>
+
+    <div class="slot-window">
+        <div class="reel-container"><div id="reel1" class="reel-strip"></div></div>
+        <div class="reel-container"><div id="reel2" class="reel-strip"></div></div>
+        <div class="reel-container"><div id="reel3" class="reel-strip"></div></div>
+    </div>
+
+    <button id="spin-btn" class="btn-spin">SPIN (10$)</button>
+
+    <div class="auto-container">
+        <span>AUTOSPIN</span>
+        <label class="switch">
+            <input type="checkbox" id="auto-toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div id="msg" class="msg-area">Ready to play?</div>
+</div>
+
+<script>
+    // ================= SETTINGS =================
+    const CHANCE_3_MATCH = 0.12; 
+    const CHANCE_2_MATCH = 0.30; 
+    const JACKPOT_CHANCE = 0.05; 
+    const SPIN_COST = 10;
+    const WIN_2_MULTIPLIER = 2;  
+    const AUTO_DELAY = 2000; // Delay between spins in auto-mode (ms)
+    // ============================================
+
+    const symbols = ['🍒', '🍋', '🍇', '🔔', '💎', '7️⃣'];
+    const multipliers = {'🍒':3, '🍋':5, '🍇':10, '🔔':20, '💎':50, '7️⃣':100};
+    
+    let balance = 1000;
+    let isSpinning = false;
+    const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+    const spinBtn = document.getElementById('spin-btn');
+    const autoToggle = document.getElementById('auto-toggle');
+    const toast = document.getElementById('win-toast');
+
+    function init() {
+        reels.forEach(reel => {
+            let content = '';
+            for(let i=0; i<15; i++) {
+                symbols.forEach(s => content += `<div class="symbol">${s}</div>`);
+            }
+            reel.innerHTML = content;
+        });
+    }
+
+    function showToast(amount) {
+        toast.textContent = `WIN: $${amount}!`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    function calculateResult() {
+        const roll = Math.random();
+        if (roll < CHANCE_3_MATCH) {
+            const isJackpot = Math.random() < JACKPOT_CHANCE;
+            const s = isJackpot ? '7️⃣' : symbols[Math.floor(Math.random() * (symbols.length - 1))];
+            return [s, s, s];
+        } 
+        if (roll < (CHANCE_3_MATCH + CHANCE_2_MATCH)) {
+            const sMatch = symbols[Math.floor(Math.random() * symbols.length)];
+            let sOther = symbols[Math.floor(Math.random() * symbols.length)];
+            while(sOther === sMatch) sOther = symbols[Math.floor(Math.random() * symbols.length)];
+            return [sMatch, sMatch, sOther].sort(() => Math.random() - 0.5);
+        }
+        let res = [];
+        while(res.length < 3) {
+            let s = symbols[Math.floor(Math.random() * symbols.length)];
+            if(!res.includes(s)) res.push(s);
+        }
+        return res;
+    }
+
+    function spin() {
+        if (isSpinning) return;
+        if (balance < SPIN_COST) {
+            autoToggle.checked = false;
+            return alert("Insufficient balance!");
+        }
+
+        isSpinning = true;
+        balance -= SPIN_COST;
+        updateUI(0);
+        
+        document.getElementById('msg').textContent = "Spinning...";
+        document.getElementById('msg').classList.remove('jackpot-text');
+        spinBtn.disabled = true;
+
+        const result = calculateResult();
+
+        reels.forEach(reel => {
+            reel.style.transition = 'none';
+            reel.classList.add('is-spinning');
+        });
+
+        reels.forEach((reel, i) => {
+            setTimeout(() => {
+                reel.classList.remove('is-spinning');
+                const symbolIdx = symbols.indexOf(result[i]);
+                const finalOffset = symbolIdx * 120;
+                reel.style.transition = 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
+                reel.style.transform = `translateY(-${finalOffset}px)`;
+            }, 1000 + (i * 600));
+        });
+
+        setTimeout(() => finalize(result), 2500);
+    }
+
+    function finalize(result) {
+        const uniqueSymbols = [...new Set(result)];
+        let winAmount = 0;
+        
+        if (uniqueSymbols.length === 1) {
+            winAmount = SPIN_COST * multipliers[result[0]];
+            document.getElementById('msg').textContent = "MEGA WIN!";
+            if(result[0] === '7️⃣') document.getElementById('msg').classList.add('jackpot-text');
+        } 
+        else if (uniqueSymbols.length === 2) {
+            winAmount = SPIN_COST * WIN_2_MULTIPLIER;
+            document.getElementById('msg').textContent = "PAIR WIN!";
+        } else {
+            document.getElementById('msg').textContent = "Try again";
+        }
+
+        if (winAmount > 0) {
+            balance += winAmount;
+            showToast(winAmount);
+            updateUI(winAmount);
+        } else {
+            updateUI(0);
+        }
+
+        isSpinning = false;
+        spinBtn.disabled = false;
+
+        // Auto-spin logic
+        if (autoToggle.checked) {
+            setTimeout(() => {
+                if (autoToggle.checked) spin();
+            }, AUTO_DELAY);
+        }
+    }
+
+    function updateUI(win) {
+        document.getElementById('balance').textContent = balance;
+        document.getElementById('last-win').textContent = win;
+    }
+
+    spinBtn.addEventListener('click', spin);
+    init();
+</script>
+
+</body>
+</html>
